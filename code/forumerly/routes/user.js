@@ -18,6 +18,7 @@ function isObject(item) {
 
 function merge(target, source) {
   Object.keys(source).forEach(key => {
+    if (key === '__proto__' || key === 'constructor' || key === 'prototype') return;
     if (isObject(source[key])) {
       if (!target[key]) {
         target[key] = {};
@@ -27,7 +28,6 @@ function merge(target, source) {
       target[key] = source[key];
     }
   });
-
   return target;
 }
 
