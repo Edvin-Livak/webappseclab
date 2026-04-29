@@ -48,7 +48,13 @@ app
   .use(helmet.contentSecurityPolicy({
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "use.fontawesome.com", "ajax.googleapis.com", "cdnjs.cloudflare.com"]
+      scriptSrc: ["'self'", "use.fontawesome.com", "ajax.googleapis.com", "cdnjs.cloudflare.com"],
+      objectSrc: ["'none'"], // Prevent Flash, plugins, etc.
+      baseUri: ["'self'"], // Prevent attackers from changing base URL
+      frameSrc: ["'none'"], // Block iframes
+      imgSrc: ["'self'", "data:"], // Allow images only from same origin and inline.
+      styleSrc: ["'self'", "'unsafe-inline'", "use.fontawesome.com", "cdnjs.cloudflare.com"], // Allow styles
+      connectSrc: ["'self'"] // Restrict ajax/fetch requests.
     }
   }))
   .use(passport.initialize())

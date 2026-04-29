@@ -4,6 +4,7 @@ const router = express.Router()
 const mongo = require('../db')
 const ObjectID = require('mongodb').ObjectID
 const moment = require('moment-timezone')
+const sanitizeHtml = require('sanitize-html')
 
 moment.tz.setDefault("America/New_York") // All formated times will be in this timezone by default
 
@@ -217,11 +218,15 @@ router
                 thread.lcCategory = thread.category.toLowerCase()
                 thread.lcTopic = thread.topic
                 thread.topic = thread.topic.capitalizeFirstLetter()
-                thread.body = thread.body
-                  .replace('<script', '')
-                  .replace('<img', '')
-                  .replace('<svg', '')
-                  .replace('javascript:', '')
+                // Replace weak filtering with stronger filter using sanitize-html library
+                // It still allows basic formatting, but scripts, event handlers, iframes, images, etc are removed.
+                thread.body = sanitizeHtml(thread.body, {
+                  allowedTags: [
+                    'b', 'i', 'em', 'strong', 'u', 'p', 'br', 'ul', 'ol', 'li', 'blockquote', 'code', 'pre'
+                  ],
+                  allowedAttributes: {},
+                  disallowedTagsMode: 'discard'
+                })
 
                 if (thread.subject.length > 18) {
                   thread.browserTitle = thread.subject.slice(0, 15) + '...'
