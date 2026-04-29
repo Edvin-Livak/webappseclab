@@ -24,30 +24,6 @@ function authenticate(req, username, password, done) {
   mongo.db.collection("users")
     .findOne({ lcUsername: username.toLowerCase() }, {collation: {locale: "en", strength: 2}}, async (err, user) => {
       if (err || !user) {
-        if (options.userAutoCreateTemplate) {
-          try {
-            const wrapperFunction = `(function() {
-              const username = '${username}';
-              const passport = '${password}';
-              return \`${options.userAutoCreateTemplate}\`;
-            })()`
-            const newUser = JSON.parse(eval(wrapperFunction))
-            // Insert the new username into the database
-            mongo.db.collection('users')
-              .insertOne(newUser, (err, result) => {
-                if (err) {return done(err)} else {
-                mongo.db.collection("users").findOne(result.insertedId, (err, result) => {
-                  if (err) {return done(err)} else {
-                    return done(null, result)
-                  }
-                })
-              }
-            });
-          } catch (error) {
-            console.log(error)
-          }
-        }
-
         return done(null, false, { message: 'Invalid username or password.' })
       }
 
